@@ -1,12 +1,13 @@
 <script>
-import AppEventsList from "./components/AppEventsList.vue";
 
 import axios from 'axios'; //importo Axios
 import { store } from "./store.js" //state management
+import TheHeader from "./components/TheHeader.vue"
+
 
 export default {
 	components: {
-		AppEventsList
+		TheHeader
 	},
 	data() {
 		return {
@@ -14,31 +15,21 @@ export default {
 		}
 	},
 	mounted() {
-		this.doThings();
-
-		// axios.get("indirizzo").then(risultato => {
-		// 	console.log(risultato);
-		// }).catch(errore => {
-		// 	console.error(errore);
-		// });
+		this.getEventList();
 	},
 	methods: {
 		getEventList() {
+
 			let url = this.store.apiUrl + this.store.apiEventEndpoint;
 
-			axios.get(url).then(result => {
-				if (result.status === 200 && result.data.success) {
-					this.store.eventList = result.data.payload;
-				} else if (result.status === 200 && !result.data.success) {
-					console.error("Ops... non siamo in grado di soddisfare la richiesta.");
-				} else if (result.status === 301) {
-					console.error("Ops... ciò che cerchi non si trova più qui.");
-				} else if (result.status === 400) {
-					console.error("Ops... non riusciamo a comprendere ciò che hai richiesto.");
-				} else if (result.status === 404) {
-					console.error("Ops... non riusciamo a trovare ciò che hai richiesto.");
-				} else if (result.status === 500) {
-					console.error("Ops... ci scusiamo per l'inconveniente, stiamo spegnendo l'incendio.");
+			axios.get(url).then(risultato => {
+				if (risultato.status === 200 && risultato.data.success) {
+					console.log(risultato.data.payload);
+					this.store.eventList = risultato.data.payload;
+				} else {
+					//ToDo: distinguere il motivo dell'else.
+					//es. controllare statusCode, presenza e veridicità di data.success
+					console.error("Ops... qualcosa è andato storto");
 				}
 			}).catch(errore => {
 				console.error(errore);
@@ -49,12 +40,10 @@ export default {
 </script>
 
 <template>
-	<main>
+	<TheHeader />
 
-		<button class="btn btn-primary">
-			<font-awesome-icon icon="fa-solid fa-home" class="me-1" />
-			<span>Primary button</span>
-		</button>
+	<main class="py-3">
+		<router-view></router-view>
 	</main>
 </template>
 
@@ -68,7 +57,4 @@ export default {
 // @use './styles/partials/variables' as *;
 
 // ...qui eventuale SCSS di App.vue
-main {
-	padding: 1rem;
-}
 </style>
